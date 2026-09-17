@@ -71,6 +71,7 @@ venv.bak/
 *.pt
 *.pth
 datasets/
+ml_engine/weights
 
 # ==========================================
 # Mobile (Flutter / React Native / Android / iOS)
