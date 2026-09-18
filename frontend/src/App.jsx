@@ -5,7 +5,8 @@ import OceanMap from './components/OceanMap';
 import SoundingDrawer from './components/SoundingDrawer';
 import 'leaflet/dist/leaflet.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Empty string uses Vite proxy (/api) locally, or environment variable in production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export default function App() {
   const [systemStatus, setSystemStatus] = useState(null);
@@ -40,7 +41,7 @@ export default function App() {
         }
       } catch (err) {
         console.error('Initialization error:', err);
-        setError('Failed to connect to OceanEmbed backend server at http://localhost:8000');
+        setError('Cannot reach OceanEmbed backend server. Please make sure the backend is running via "python start_servers.py" (port 8000).');
       }
     }
     initPlatform();
@@ -63,7 +64,11 @@ export default function App() {
       setSoundingData(response.data);
     } catch (err) {
       console.error('Inference error:', err);
-      setError(err.response?.data?.detail || 'Failed to generate 3D vertical profile.');
+      if (err.code === 'ERR_NETWORK' || !err.response) {
+        setError('Cannot reach backend on http://127.0.0.1:8000. Start backend with: python start_servers.py');
+      } else {
+        setError(err.response?.data?.detail || 'Failed to generate 3D vertical profile.');
+      }
     } finally {
       setLoading(false);
     }
